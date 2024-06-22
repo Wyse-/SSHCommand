@@ -21,6 +21,7 @@ DEFAULT_SCHEMA = vol.Schema(
 
 CONFIG_SCHEMA = vol.Schema({DOMAIN: DEFAULT_SCHEMA}, extra=vol.ALLOW_EXTRA)
 
+cachedSshClients = {}
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     default = config[DOMAIN] if DOMAIN in config else DEFAULT_SCHEMA({})
@@ -32,8 +33,11 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         password = call.data.get("pass", default["pass"])
         command = call.data["command"]
 
-        client = SSHClient()
-        client.set_missing_host_key_policy(AutoAddPolicy())
+        if((host + port + username) in cachedSshClients):
+            client = cachedSshClients[host + port + username]
+        else:
+            client = SSHClient()
+            client.set_missing_host_key_policy(AutoAddPolicy())
 
         try:
             if private_key := call.data.get("private_key"):
@@ -47,12 +51,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             return {"error": repr(e)}
 
         _, stdout, stderr = client.exec_command(command)
+        cachedSshClients[host + port + username] = client
         response = {
             "command": command,
             "stdout": stdout.read().decode("utf-8"),
             "stderr": stderr.read().decode("utf-8"),
         }
-        client.close()
 
         _LOGGER.info(response)
 
