@@ -33,7 +33,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         password = call.data.get("pass", default["pass"])
         command = call.data["command"]
 
-        if((host + port + username) in cachedSshClients):
+        if((host + str(port) + username) in cachedSshClients):
             client = cachedSshClients[host + port + username]
         else:
             client = SSHClient()
