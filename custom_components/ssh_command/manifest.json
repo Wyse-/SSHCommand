@@ -2,15 +2,15 @@
   "domain": "ssh_command",
   "name": "SSH Command",
   "codeowners": [
-    "@AlexxIT"
+    "Wyse-"
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/AlexxIT/SSHCommand",
+  "documentation": "https://github.com/Wyse-/SSHCommand",
   "iot_class": "calculated",
-  "issue_tracker": "https://github.com/AlexxIT/DashCast/issues",
+  "issue_tracker": "https://github.com/Wyse-/SSHCommand/issues",
   "requirements": [
     "paramiko"
   ],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
