@@ -40,25 +40,23 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             client = SSHClient()
             client.set_missing_host_key_policy(AutoAddPolicy())
 
-        try:
-            if private_key := call.data.get("private_key"):
-                key = RSAKey.from_private_key_file(private_key)
-                client.connect(host, port, username, pkey=key)
-            else:
-                # Use password for authentication if SSH key is not provided
-                client.connect(host, port, username, password)
-        except Exception as e:
-            _LOGGER.error(f"Failed to connect: {repr(e)}")
-            return {"error": repr(e)}
+            try:
+                if private_key := call.data.get("private_key"):
+                    key = RSAKey.from_private_key_file(private_key)
+                    client.connect(host, port, username, pkey=key)
+                else:
+                    # Use password for authentication if SSH key is not provided
+                    client.connect(host, port, username, password)
+            except Exception as e:
+                _LOGGER.error(f"Failed to connect: {repr(e)}")
+                return {"error": repr(e)}
 
         _, stdout, stderr = client.exec_command(command)
-        cached_ssh_clients[ssh_client_cache_key] = client
         response = {
             "command": command,
             "stdout": stdout.read().decode("utf-8"),
             "stderr": stderr.read().decode("utf-8"),
         }
-
         _LOGGER.info(response)
 
     # ServiceResponse from Hass 2023.7
